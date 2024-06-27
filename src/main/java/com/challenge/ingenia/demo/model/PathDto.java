@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Schema(description = "Details about a path")
-public class Path {
+public class PathDto {
 
     @Schema( example = "1", description = "id the path"  )
     private Long pathId;

@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Schema(description = "Details about a station")
-public class Station {
+public class StationDto {
 
     @Schema(example = "1", description = "ID of the station")
     private Long stationId;
