@@ -4,6 +4,9 @@ import com.challenge.ingenia.demo.model.PathJpa;
 import com.challenge.ingenia.demo.model.StationJpa;
 import com.challenge.ingenia.demo.repositories.PathJpaRepository;
 import com.challenge.ingenia.demo.repositories.StationJpaRepository;
+import com.challenge.ingenia.demo.services.ChallengeService;
+import com.challenge.ingenia.demo.services.ChallengeServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,6 +33,8 @@ class IntegrationJpaTests {
     private PathJpaRepository pathJpaRepository;
     private PathJpa testPath;
 
+    private ChallengeService challengeService;
+
     @BeforeEach
     public void setUp() {
         testStation = new StationJpa();
@@ -38,9 +45,17 @@ class IntegrationJpaTests {
         testPath = new PathJpa();
         testPath.setId(5L);
         testPath.setCost(23);
-        testPath.setSourceId(4L);
-        testPath.setDestinationId(2L);
+        StationJpa stationSource = stationJpaRepository.findById(4L)
+                .orElseThrow(() -> new EntityNotFoundException("Station with id 4 not found"));
+
+        testPath.setSourceStation(stationSource);
+        StationJpa stationDestination = stationJpaRepository.findById(2L)
+                .orElseThrow(() -> new EntityNotFoundException("Station with id 4 not found"));
+        testPath.setDestinationStation(stationDestination);
         pathJpaRepository.save(testPath);
+
+        challengeService = new ChallengeServiceImpl(stationJpaRepository,pathJpaRepository);
+
     }
 
     @AfterEach
@@ -62,11 +77,45 @@ class IntegrationJpaTests {
         PathJpa savedPath = pathJpaRepository.findById(testPath.getId()).orElse(null);
         assertNotNull(savedPath);
         assertEquals(testPath.getId(), savedPath.getId());
-        assertEquals(testPath.getSourceId(), savedPath.getSourceId());
-        assertEquals(testPath.getDestinationId(), savedPath.getDestinationId());
+        assertEquals(testPath.getSourceStation(), savedPath.getSourceStation());
+        assertEquals(testPath.getDestinationStation(), savedPath.getDestinationStation());
         assertEquals(testPath.getCost(), savedPath.getCost());
     }
 
+    @Test
+    void test_whenCallGetServiceForStations_thenGetListStations() {
+        List<StationJpa> stations = challengeService.getAllStations();
+        assertEquals("Barcelona", stations.get(0).getName());
+        assertEquals("Paris", stations.get(1).getName());
+        assertEquals("Berlin", stations.get(2).getName());
+        assertEquals("Roma", stations.get(3).getName());
+    }
+
+    @Test
+    void test_whenCallGetServiceForPaths_thenGetListStations() {
+
+        List<PathJpa> paths = challengeService.getAllPaths();
+        assertEquals(1L, paths.get(0).getId());
+        assertEquals(50, paths.get(0).getCost());
+        assertEquals(1L, paths.get(0).getSourceStation().getId());
+        assertEquals(2L, paths.get(0).getDestinationStation().getId());
+
+        assertEquals(2L, paths.get(1).getId());
+        assertEquals(100, paths.get(1).getCost());
+        assertEquals(1L, paths.get(1).getSourceStation().getId());
+        assertEquals(3L, paths.get(1).getDestinationStation().getId());
+
+        assertEquals(3L, paths.get(2).getId());
+        assertEquals(60, paths.get(2).getCost());
+        assertEquals(1L, paths.get(2).getSourceStation().getId());
+        assertEquals(4L, paths.get(2).getDestinationStation().getId());
+
+        assertEquals(4L, paths.get(3).getId());
+        assertEquals(20, paths.get(3).getCost());
+        assertEquals(4L, paths.get(3).getSourceStation().getId());
+        assertEquals(3L, paths.get(3).getDestinationStation().getId());
+
+    }
 
 
 }

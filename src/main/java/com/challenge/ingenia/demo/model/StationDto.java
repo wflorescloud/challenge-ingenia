@@ -1,13 +1,11 @@
 package com.challenge.ingenia.demo.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
 
 
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+
+
 @Schema(description = "Details about a station")
 public class StationDto {
 
@@ -21,7 +19,15 @@ public class StationDto {
         return stationId;
     }
 
+    public void setStationId(Long stationId) {
+        this.stationId = stationId;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

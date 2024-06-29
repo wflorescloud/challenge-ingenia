@@ -1,9 +1,8 @@
 package com.challenge.ingenia.demo.controllers;
 
 
-import com.challenge.ingenia.demo.model.ChallengeResponse;
-import com.challenge.ingenia.demo.model.PathDto;
-import com.challenge.ingenia.demo.model.StationDto;
+import com.challenge.ingenia.demo.model.*;
+import com.challenge.ingenia.demo.services.ChallengeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Tag(name = "Journeys")
 @RestController
 @RequestMapping("/journeys")
@@ -23,16 +25,41 @@ public class ChallengeController {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(ChallengeController.class);
 
-    @Operation(summary = "Get paths for source id and destination id")
-    @GetMapping("/paths/{sourceId}/{destinationId}")
-    public ResponseEntity<ChallengeResponse> getPath(@Parameter(description = "source id", example = "12") @PathVariable(required = false) String sourceId,
-                                                     @Parameter(description = "destination id", example = "8") @PathVariable(required = false) String destinationId) {
-        ChallengeResponse challengeResponse = new ChallengeResponse();
-        LOGGER.info("source id {} ",sourceId);
-        LOGGER.info("destination id {}",destinationId);
-        return new ResponseEntity<>(challengeResponse, HttpStatus.OK);
+    private final ChallengeService challengeService;
+
+    public ChallengeController(ChallengeService challengeService) {
+        this.challengeService = challengeService;
     }
 
+    @Operation(summary = "Get paths for source id and destination id")
+    @GetMapping("/paths/{sourceId}/{destinationId}")
+    public ResponseEntity<ChallengePathResponse> getPath(@Parameter(description = "source id", example = "12") @PathVariable(required = false) String sourceId,
+                                                         @Parameter(description = "destination id", example = "8") @PathVariable(required = false) String destinationId) {
+        ChallengePathResponse challengePathResponse = new ChallengePathResponse();
+        return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get all paths")
+    @GetMapping("/paths")
+    public ResponseEntity<ChallengePathResponse> getPaths() {
+        ChallengePathResponse challengePathResponse = new ChallengePathResponse();
+        List<PathJpa> paths = challengeService.getAllPaths();
+        List<PathDto> pathDtos = paths.stream().map(PathMapper::toDto).toList();
+        challengePathResponse.setStatus("OK");
+        challengePathResponse.setPaths(pathDtos);
+        return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get all stations")
+    @GetMapping("/stations")
+    public ResponseEntity<ChallengeStationResponse> getStations() {
+        ChallengeStationResponse challengeStationResponse = new ChallengeStationResponse();
+        List<StationJpa> stations = challengeService.getAllStations();
+        List<StationDto> stationDtos = stations.stream().map(StationMapper::toDto).toList();
+        challengeStationResponse.setStatus("OK");
+        challengeStationResponse.setPaths(stationDtos);
+        return new ResponseEntity<>(challengeStationResponse, HttpStatus.OK);
+    }
 
     @Operation(summary = "Post station",
             description = "Create a new station",
@@ -45,10 +72,10 @@ public class ChallengeController {
                     @ApiResponse(responseCode = "400", description = "Invalid input data")
             })
     @PostMapping("/stations")
-    public ResponseEntity<ChallengeResponse> postStation(@RequestBody StationDto body) {
-        ChallengeResponse challengeResponse = new ChallengeResponse();
+    public ResponseEntity<ChallengePathResponse> postStation(@RequestBody StationDto body) {
+        ChallengePathResponse challengePathResponse = new ChallengePathResponse();
         LOGGER.info("postStation");
-        return new ResponseEntity<>(challengeResponse, HttpStatus.OK);
+        return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
     }
 
 
@@ -63,10 +90,10 @@ public class ChallengeController {
                     @ApiResponse(responseCode = "400", description = "Invalid input data")
             })
     @PostMapping("/paths")
-    public ResponseEntity<ChallengeResponse> postPath(@RequestBody PathDto body) {
-        ChallengeResponse challengeResponse = new ChallengeResponse();
+    public ResponseEntity<ChallengePathResponse> postPath(@RequestBody PathDto body) {
+        ChallengePathResponse challengePathResponse = new ChallengePathResponse();
         LOGGER.info("postPath");
-        return new ResponseEntity<>(challengeResponse, HttpStatus.OK);
+        return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
 
     }
 
