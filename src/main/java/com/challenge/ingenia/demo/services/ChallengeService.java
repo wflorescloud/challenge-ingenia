@@ -1,6 +1,7 @@
 package com.challenge.ingenia.demo.services;
 
 import com.challenge.ingenia.demo.model.PathJpa;
+import com.challenge.ingenia.demo.model.PathSimpleDto;
 import com.challenge.ingenia.demo.model.StationDto;
 import com.challenge.ingenia.demo.model.StationJpa;
 import org.springframework.stereotype.Service;
@@ -18,4 +19,5 @@ public interface ChallengeService {
 
     StationJpa saveStation(StationDto stationDto);
 
+    PathJpa savePath(PathSimpleDto pathSimpleDto);
 }

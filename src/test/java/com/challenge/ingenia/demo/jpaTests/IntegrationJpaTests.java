@@ -2,9 +2,7 @@ package com.challenge.ingenia.demo.jpaTests;
 
 import com.challenge.ingenia.demo.commons.BusinessMessages;
 import com.challenge.ingenia.demo.exceptions.ResourceNotFoundException;
-import com.challenge.ingenia.demo.model.PathJpa;
-import com.challenge.ingenia.demo.model.StationDto;
-import com.challenge.ingenia.demo.model.StationJpa;
+import com.challenge.ingenia.demo.model.*;
 import com.challenge.ingenia.demo.repositories.PathJpaRepository;
 import com.challenge.ingenia.demo.repositories.StationJpaRepository;
 import com.challenge.ingenia.demo.services.ChallengeService;
@@ -144,6 +142,48 @@ class IntegrationJpaTests {
         StationJpa stationJpa= challengeService.saveStation(stationDto);
         assertEquals(5L, stationJpa.getId());
         assertEquals("Londres", stationJpa.getName());
+    }
+
+    @Test
+    void test_whenCallPostServiceForPathAndNotExitsSourceStation_thenThrowResourceNotFoundException() {
+        PathSimpleDto pathSimpleDto = new PathSimpleDto();
+        pathSimpleDto.setPathId(5L);
+        pathSimpleDto.setCost(75.0);
+        pathSimpleDto.setSourceId(99L);
+        pathSimpleDto.setDestinationId(2L);
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> challengeService.savePath(pathSimpleDto)
+        );
+        assertEquals(BusinessMessages.CodeService.CODE_STATION_0100.getMessage(), exception.getMessage());
+    }
+
+    @Test
+    void test_whenCallPostServiceForPathAndNotExitsDestinationSourceStation_thenThrowResourceNotFoundException() {
+        PathSimpleDto pathSimpleDto = new PathSimpleDto();
+        pathSimpleDto.setPathId(5L);
+        pathSimpleDto.setCost(75.0);
+        pathSimpleDto.setSourceId(1L);
+        pathSimpleDto.setDestinationId(99L);
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> challengeService.savePath(pathSimpleDto)
+        );
+        assertEquals(BusinessMessages.CodeService.CODE_STATION_0200.getMessage(), exception.getMessage());
+    }
+
+    @Test
+    void test_whenCallPostServiceForPathAndExitsStations_thenSavePath() {
+        PathSimpleDto pathSimpleDto = new PathSimpleDto();
+        pathSimpleDto.setPathId(5L);
+        pathSimpleDto.setCost(75.0);
+        pathSimpleDto.setSourceId(4L);
+        pathSimpleDto.setDestinationId(2L);
+        PathJpa pathJpa = challengeService.savePath(pathSimpleDto);
+        assertEquals(5L, pathJpa.getId());
+        assertEquals(75, pathJpa.getCost());
+        assertEquals(4L, pathJpa.getSourceStation().getId());
+        assertEquals(2L, pathJpa.getDestinationStation().getId());
 
     }
 

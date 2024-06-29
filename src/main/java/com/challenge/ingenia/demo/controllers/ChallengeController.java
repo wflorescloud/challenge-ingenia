@@ -89,15 +89,17 @@ public class ChallengeController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Path object to be created",
                     required = true,
-                    content = @Content(schema = @Schema(implementation = PathDto.class))),
+                    content = @Content(schema = @Schema(implementation = PathSimpleDto.class))),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Successfully created path"),
                     @ApiResponse(responseCode = "400", description = "Invalid input data")
             })
     @PostMapping("/paths")
-    public ResponseEntity<ChallengePathResponse> postPath(@RequestBody PathDto body) {
+    public ResponseEntity<ChallengePathResponse> postPath(@RequestBody PathSimpleDto body) {
         ChallengePathResponse challengePathResponse = new ChallengePathResponse();
-        LOGGER.info("postPath");
+        PathJpa pathJpa = challengeService.savePath(body);
+        challengePathResponse.setStatus("OK");
+        challengePathResponse.setPaths(Utils.converterPathToDto(Collections.singletonList(pathJpa)));
         return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
 
     }
