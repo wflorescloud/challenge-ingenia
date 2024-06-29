@@ -1,5 +1,7 @@
 package com.challenge.ingenia.demo.services;
 
+import com.challenge.ingenia.demo.commons.BusinessMessages;
+import com.challenge.ingenia.demo.exceptions.ResourceNotFoundException;
 import com.challenge.ingenia.demo.model.PathJpa;
 import com.challenge.ingenia.demo.model.StationJpa;
 import com.challenge.ingenia.demo.repositories.PathJpaRepository;
@@ -7,6 +9,7 @@ import com.challenge.ingenia.demo.repositories.StationJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ChallengeServiceImpl implements ChallengeService {
@@ -30,4 +33,11 @@ public class ChallengeServiceImpl implements ChallengeService {
         return pathJpaRepository.findAll();
     }
 
+    @Override
+    public List<PathJpa> getBySourceAndDestination(long sourceId, long destinationId) {
+        return pathJpaRepository.findBySourceStationIdAndDestinationStationId(sourceId, destinationId)
+                .filter(paths -> !paths.isEmpty())
+                .orElseThrow(() -> new ResourceNotFoundException(BusinessMessages.CodeService.CODE_PATH_0100.getMessage(),
+                        BusinessMessages.CodeService.CODE_PATH_0100.name()));
+    }
 }

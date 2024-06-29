@@ -1,5 +1,7 @@
 package com.challenge.ingenia.demo.jpaTests;
 
+import com.challenge.ingenia.demo.commons.BusinessMessages;
+import com.challenge.ingenia.demo.exceptions.ResourceNotFoundException;
 import com.challenge.ingenia.demo.model.PathJpa;
 import com.challenge.ingenia.demo.model.StationJpa;
 import com.challenge.ingenia.demo.repositories.PathJpaRepository;
@@ -17,8 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @EnableJpaRepositories(basePackages = "com.challenge.ingenia.demo.repositories")
@@ -55,7 +56,6 @@ class IntegrationJpaTests {
         pathJpaRepository.save(testPath);
 
         challengeService = new ChallengeServiceImpl(stationJpaRepository,pathJpaRepository);
-
     }
 
     @AfterEach
@@ -93,7 +93,6 @@ class IntegrationJpaTests {
 
     @Test
     void test_whenCallGetServiceForPaths_thenGetListStations() {
-
         List<PathJpa> paths = challengeService.getAllPaths();
         assertEquals(1L, paths.get(0).getId());
         assertEquals(50, paths.get(0).getCost());
@@ -117,6 +116,24 @@ class IntegrationJpaTests {
 
     }
 
+    @Test
+    void test_whenCallGetServiceForPathID_thenGetPath() {
+        List<PathJpa> path = challengeService.getBySourceAndDestination(1L, 2L);
+        assertEquals(1L, path.get(0).getId());
+        assertEquals(50, path.get(0).getCost());
+        assertEquals(1L, path.get(0).getSourceStation().getId());
+        assertEquals(2L, path.get(0).getDestinationStation().getId());
+    }
+
+    @Test
+    void test_whenCallGetServiceForNonExistentPath_thenThrowResourceNotFoundException() {
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> challengeService.getBySourceAndDestination(99L, 99L)
+        );
+        assertEquals(BusinessMessages.CodeService.CODE_PATH_0100.getMessage(), exception.getMessage());
+        assertEquals(BusinessMessages.CodeService.CODE_PATH_0100.name(), exception.getAppCode());
+    }
 
 }
 

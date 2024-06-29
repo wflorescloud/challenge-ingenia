@@ -2,6 +2,7 @@ package com.challenge.ingenia.demo.controllers;
 
 
 import com.challenge.ingenia.demo.commons.BusinessMessages;
+import com.challenge.ingenia.demo.commons.Utils;
 import com.challenge.ingenia.demo.exceptions.ResourceNotFoundException;
 import com.challenge.ingenia.demo.model.*;
 import com.challenge.ingenia.demo.services.ChallengeService;
@@ -37,12 +38,9 @@ public class ChallengeController {
     public ResponseEntity<ChallengePathResponse> getPath(@Parameter(description = "source id", example = "12") @PathVariable(required = true) Long sourceId,
                                                          @Parameter(description = "destination id", example = "8") @PathVariable(required = true) Long destinationId) {
         ChallengePathResponse challengePathResponse = new ChallengePathResponse();
-
-
-        if (sourceId == 1) {
-            throw new ResourceNotFoundException(BusinessMessages.CodeService.CODE_PATH_0100.getMessage(),BusinessMessages.CodeService.CODE_PATH_0100.name());
-        }
-
+        List<PathJpa> paths = challengeService.getBySourceAndDestination(sourceId, destinationId);
+        challengePathResponse.setStatus("OK");
+        challengePathResponse.setPaths(Utils.converterPathToDto(paths));
         return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
     }
 
@@ -51,9 +49,8 @@ public class ChallengeController {
     public ResponseEntity<ChallengePathResponse> getPaths() {
         ChallengePathResponse challengePathResponse = new ChallengePathResponse();
         List<PathJpa> paths = challengeService.getAllPaths();
-        List<PathDto> pathDtos = paths.stream().map(PathMapper::toDto).toList();
         challengePathResponse.setStatus("OK");
-        challengePathResponse.setPaths(pathDtos);
+        challengePathResponse.setPaths(Utils.converterPathToDto(paths));
         return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
     }
 
@@ -62,9 +59,8 @@ public class ChallengeController {
     public ResponseEntity<ChallengeStationResponse> getStations() {
         ChallengeStationResponse challengeStationResponse = new ChallengeStationResponse();
         List<StationJpa> stations = challengeService.getAllStations();
-        List<StationDto> stationDtos = stations.stream().map(StationMapper::toDto).toList();
         challengeStationResponse.setStatus("OK");
-        challengeStationResponse.setPaths(stationDtos);
+        challengeStationResponse.setPaths(Utils.converterStationToDto(stations));
         return new ResponseEntity<>(challengeStationResponse, HttpStatus.OK);
     }
 

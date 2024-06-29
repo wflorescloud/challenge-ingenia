@@ -12,4 +12,7 @@ public interface ChallengeService {
     List<StationJpa> getAllStations() ;
 
     List<PathJpa> getAllPaths();
+
+    List<PathJpa> getBySourceAndDestination(long sourceId, long destinationId);
+
 }
