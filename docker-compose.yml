@@ -1,0 +1,8 @@
+services:
+  challange-ingenia:
+    image: challange-ingenia:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
