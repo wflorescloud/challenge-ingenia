@@ -1,9 +1,7 @@
 package com.challenge.ingenia.demo.controllers;
 
 
-import com.challenge.ingenia.demo.commons.BusinessMessages;
 import com.challenge.ingenia.demo.commons.Utils;
-import com.challenge.ingenia.demo.exceptions.ResourceNotFoundException;
 import com.challenge.ingenia.demo.model.*;
 import com.challenge.ingenia.demo.services.ChallengeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 import java.util.List;
 
 
@@ -60,25 +60,27 @@ public class ChallengeController {
         ChallengeStationResponse challengeStationResponse = new ChallengeStationResponse();
         List<StationJpa> stations = challengeService.getAllStations();
         challengeStationResponse.setStatus("OK");
-        challengeStationResponse.setPaths(Utils.converterStationToDto(stations));
+        challengeStationResponse.setStations(Utils.converterStationToDto(stations));
         return new ResponseEntity<>(challengeStationResponse, HttpStatus.OK);
     }
 
     @Operation(summary = "Post station",
             description = "Create a new station",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Station object to be created",
+                    description = "station object to be created",
                     required = true,
                     content = @Content(schema = @Schema(implementation = StationDto.class))),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Successfully created station"),
+                    @ApiResponse(responseCode = "200", description = "Successfully created path"),
                     @ApiResponse(responseCode = "400", description = "Invalid input data")
             })
     @PostMapping("/stations")
-    public ResponseEntity<ChallengePathResponse> postStation(@RequestBody StationDto body) {
-        ChallengePathResponse challengePathResponse = new ChallengePathResponse();
-        LOGGER.info("postStation");
-        return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
+    public ResponseEntity<ChallengeStationResponse> postStation(@RequestBody StationDto body) {
+        ChallengeStationResponse challengeStationResponse = new ChallengeStationResponse();
+        StationJpa stationJpa = challengeService.saveStation(body);
+        challengeStationResponse.setStatus("OK");
+        challengeStationResponse.setStations(Utils.converterStationToDto(Collections.singletonList(stationJpa)));
+        return new ResponseEntity<>(challengeStationResponse, HttpStatus.OK);
     }
 
 

@@ -11,4 +11,14 @@ public class StationMapper {
         dto.setName(station.getName());
         return dto;
     }
+
+    public static StationJpa toJpa(StationDto stationDto) {
+        if (stationDto == null) {
+            return null;
+        }
+        StationJpa stationJpa = new StationJpa();
+        stationJpa.setId(stationDto.getStationId());
+        stationJpa.setName(stationDto.getName());
+        return stationJpa;
+    }
 }

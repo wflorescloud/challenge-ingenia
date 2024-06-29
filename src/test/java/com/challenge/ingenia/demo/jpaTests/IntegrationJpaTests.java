@@ -3,6 +3,7 @@ package com.challenge.ingenia.demo.jpaTests;
 import com.challenge.ingenia.demo.commons.BusinessMessages;
 import com.challenge.ingenia.demo.exceptions.ResourceNotFoundException;
 import com.challenge.ingenia.demo.model.PathJpa;
+import com.challenge.ingenia.demo.model.StationDto;
 import com.challenge.ingenia.demo.model.StationJpa;
 import com.challenge.ingenia.demo.repositories.PathJpaRepository;
 import com.challenge.ingenia.demo.repositories.StationJpaRepository;
@@ -133,6 +134,17 @@ class IntegrationJpaTests {
         );
         assertEquals(BusinessMessages.CodeService.CODE_PATH_0100.getMessage(), exception.getMessage());
         assertEquals(BusinessMessages.CodeService.CODE_PATH_0100.name(), exception.getAppCode());
+    }
+
+    @Test
+    void test_whenCallPostServiceForStation_thenSaveStation() {
+        StationDto stationDto = new StationDto();
+        stationDto.setStationId(5L);
+        stationDto.setName("Londres");
+        StationJpa stationJpa= challengeService.saveStation(stationDto);
+        assertEquals(5L, stationJpa.getId());
+        assertEquals("Londres", stationJpa.getName());
+
     }
 
 }

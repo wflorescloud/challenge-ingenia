@@ -11,7 +11,7 @@ public class ChallengeStationResponse {
     private String status;
 
     @Schema(example = "Stations", description = "list of stations")
-    private List<StationDto> paths;
+    private List<StationDto> stations;
 
     public String getStatus() {
         return status;
@@ -21,11 +21,11 @@ public class ChallengeStationResponse {
         this.status = status;
     }
 
-    public List<StationDto> getPaths() {
-        return paths;
+    public List<StationDto> getStations() {
+        return stations;
     }
 
-    public void setPaths(List<StationDto> paths) {
-        this.paths = paths;
+    public void setStations(List<StationDto> stations) {
+        this.stations = stations;
     }
 }
