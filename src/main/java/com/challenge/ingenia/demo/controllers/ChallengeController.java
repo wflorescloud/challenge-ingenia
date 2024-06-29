@@ -1,6 +1,8 @@
 package com.challenge.ingenia.demo.controllers;
 
 
+import com.challenge.ingenia.demo.commons.BusinessMessages;
+import com.challenge.ingenia.demo.exceptions.ResourceNotFoundException;
 import com.challenge.ingenia.demo.model.*;
 import com.challenge.ingenia.demo.services.ChallengeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,9 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Tag(name = "Journeys")
 @RestController
@@ -33,9 +34,15 @@ public class ChallengeController {
 
     @Operation(summary = "Get paths for source id and destination id")
     @GetMapping("/paths/{sourceId}/{destinationId}")
-    public ResponseEntity<ChallengePathResponse> getPath(@Parameter(description = "source id", example = "12") @PathVariable(required = false) String sourceId,
-                                                         @Parameter(description = "destination id", example = "8") @PathVariable(required = false) String destinationId) {
+    public ResponseEntity<ChallengePathResponse> getPath(@Parameter(description = "source id", example = "12") @PathVariable(required = true) Long sourceId,
+                                                         @Parameter(description = "destination id", example = "8") @PathVariable(required = true) Long destinationId) {
         ChallengePathResponse challengePathResponse = new ChallengePathResponse();
+
+
+        if (sourceId == 1) {
+            throw new ResourceNotFoundException(BusinessMessages.CodeService.CODE_PATH_0100.getMessage(),BusinessMessages.CodeService.CODE_PATH_0100.name());
+        }
+
         return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
     }
 
