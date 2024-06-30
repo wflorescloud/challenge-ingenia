@@ -80,7 +80,7 @@ public class ChallengeController {
         StationJpa stationJpa = challengeService.saveStation(body);
         challengeStationResponse.setStatus("OK");
         challengeStationResponse.setStations(Utils.converterStationToDto(Collections.singletonList(stationJpa)));
-        return new ResponseEntity<>(challengeStationResponse, HttpStatus.OK);
+        return new ResponseEntity<>(challengeStationResponse, HttpStatus.CREATED);
     }
 
 
@@ -100,7 +100,7 @@ public class ChallengeController {
         PathJpa pathJpa = challengeService.savePath(body);
         challengePathResponse.setStatus("OK");
         challengePathResponse.setPaths(Utils.converterPathToDto(Collections.singletonList(pathJpa)));
-        return new ResponseEntity<>(challengePathResponse, HttpStatus.OK);
+        return new ResponseEntity<>(challengePathResponse, HttpStatus.CREATED);
 
     }
 
